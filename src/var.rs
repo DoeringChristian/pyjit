@@ -185,4 +185,21 @@ impl Var {
         let idx = Self::from_any_of(idx, VarType::U32)?.0;
         Ok(Var(self.0.gather(&idx, mask.as_ref())))
     }
+    pub fn __repr__(&self) -> String {
+        match self.0.ty() {
+            VarType::Void => format!(""),
+            VarType::Bool => format!("{:?}", self.0.to_host_bool().as_slice()),
+            VarType::I8 => format!("{:?}", self.0.to_host_i8().as_slice()),
+            VarType::U8 => format!("{:?}", self.0.to_host_u8().as_slice()),
+            VarType::I16 => format!("{:?}", self.0.to_host_i16().as_slice()),
+            VarType::U16 => format!("{:?}", self.0.to_host_u16().as_slice()),
+            VarType::I32 => format!("{:?}", self.0.to_host_i32().as_slice()),
+            VarType::U32 => format!("{:?}", self.0.to_host_u32().as_slice()),
+            VarType::I64 => format!("{:?}", self.0.to_host_i64().as_slice()),
+            VarType::U64 => format!("{:?}", self.0.to_host_u64().as_slice()),
+            VarType::F16 => todo!(),
+            VarType::F32 => format!("{:?}", self.0.to_host_f32().as_slice()),
+            VarType::F64 => format!("{:?}", self.0.to_host_f64().as_slice()),
+        }
+    }
 }

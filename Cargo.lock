@@ -432,6 +432,7 @@ checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
 [[package]]
 name = "optix-rs"
 version = "0.1.0"
+source = "git+https://github.com/DoeringChristian/optix-rs.git#92b72f903c45862f08c26850953fcf5e9e133b6f"
 dependencies = [
  "cuda-rs",
  "glob",
@@ -699,6 +700,7 @@ checksum = "a5996294f19bd3aae0453a862ad728f60e6600695733dd5df01da90c54363a3c"
 [[package]]
 name = "rjit"
 version = "0.1.0"
+source = "git+https://github.com/DoeringChristian/cudajit#d662531f96024c74a301136df0e3b3075755ac9c"
 dependencies = [
  "approx",
  "bitflags 2.2.1",
