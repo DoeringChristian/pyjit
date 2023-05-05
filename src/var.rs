@@ -1,6 +1,7 @@
 use crate::funcs::IR;
 use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
+use pyo3::types::PyList;
 use rjit::{ReduceOp, VarType};
 
 #[pyclass]
@@ -74,23 +75,6 @@ impl Var {
             ), // "Could not cast python type to jit type!",
         ))
     }
-}
-
-macro_rules! bop {
-    ($op:ident) => {
-        pub fn $op(&self, other: &PyAny) -> PyResult<Self> {
-            let other = Self::from_any_of(other, self.0.ty())?;
-            Ok(Var(self.0.$op(&other.0)))
-        }
-    };
-}
-
-macro_rules! uop {
-    ($op:ident) => {
-        pub fn $op(&self) -> PyResult<Self> {
-            Ok(Var(self.0.$op()))
-        }
-    };
 }
 
 #[pymethods]
@@ -185,6 +169,50 @@ impl Var {
         let idx = Self::from_any_of(idx, VarType::U32)?.0;
         Ok(Var(self.0.gather(&idx, mask.as_ref())))
     }
+    pub fn trace_ray(
+        &self,
+        payload_count: usize,
+        o: Vec<Self>,
+        d: Vec<Self>,
+        tmin: &Self,
+        tmax: &Self,
+        t: &Self,
+        vis_mask: Option<&Self>,
+        flags: Option<&Self>,
+        sbt_offset: Option<&Self>,
+        sbt_stride: Option<&Self>,
+        miss_sbt: Option<&Self>,
+        mask: Option<&Self>,
+    ) -> PyResult<Vec<Self>> {
+        let o = [&o[0].0, &o[1].0, &o[2].0];
+        let d = [&d[0].0, &d[1].0, &d[2].0];
+        let vis_mask = vis_mask.map(|v| &v.0);
+        let flags = flags.map(|v| &v.0);
+        let sbt_offset = sbt_offset.map(|v| &v.0);
+        let sbt_stride = sbt_stride.map(|v| &v.0);
+        let miss_sbt = miss_sbt.map(|v| &v.0);
+        let mask = mask.map(|v| &v.0);
+
+        Ok(self
+            .0
+            .trace_ray(
+                payload_count,
+                o,
+                d,
+                &tmin.0,
+                &tmax.0,
+                &t.0,
+                vis_mask,
+                flags,
+                sbt_offset,
+                sbt_stride,
+                miss_sbt,
+                mask,
+            )
+            .into_iter()
+            .map(|p| Var(p))
+            .collect::<Vec<_>>())
+    }
     pub fn __repr__(&self) -> String {
         match self.0.ty() {
             VarType::Void => format!(""),
@@ -200,6 +228,23 @@ impl Var {
             VarType::F16 => todo!(),
             VarType::F32 => format!("{:?}", self.0.to_host_f32().as_slice()),
             VarType::F64 => format!("{:?}", self.0.to_host_f64().as_slice()),
+        }
+    }
+    pub fn to_list<'a>(&self, py: Python<'a>) -> &'a PyList {
+        match self.0.ty() {
+            VarType::Void => todo!(),
+            VarType::Bool => PyList::new(py, self.0.to_host_bool()),
+            VarType::I8 => PyList::new(py, self.0.to_host_i8()),
+            VarType::U8 => PyList::new(py, self.0.to_host_u8()),
+            VarType::I16 => PyList::new(py, self.0.to_host_i16()),
+            VarType::U16 => PyList::new(py, self.0.to_host_u16()),
+            VarType::I32 => PyList::new(py, self.0.to_host_i32()),
+            VarType::U32 => PyList::new(py, self.0.to_host_u32()),
+            VarType::I64 => PyList::new(py, self.0.to_host_i64()),
+            VarType::U64 => PyList::new(py, self.0.to_host_u64()),
+            VarType::F16 => todo!(),
+            VarType::F32 => PyList::new(py, self.0.to_host_f32()),
+            VarType::F64 => PyList::new(py, self.0.to_host_f64()),
         }
     }
 }
