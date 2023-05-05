@@ -3,6 +3,7 @@ use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use pyo3::prelude::*;
 use pyo3::types::PyTuple;
+use rjit::backend::CompileOptions;
 use rjit::{Jit, Trace};
 
 pub static IR: Lazy<Trace> = Lazy::new(|| Trace::default());
@@ -10,13 +11,30 @@ pub static IR: Lazy<Trace> = Lazy::new(|| Trace::default());
 static JIT: Lazy<Mutex<Jit>> = Lazy::new(|| Mutex::new(Jit::default()));
 
 #[pyfunction]
-pub fn eval() {
-    JIT.lock().eval(&mut IR.lock())
+pub fn set_miss(enty_point: &str, source: &str) {
+    IR.backend().set_miss_from_str(enty_point, source);
+}
+
+#[pyfunction]
+pub fn push_hit(enty_point: &str, source: &str) {
+    IR.backend().push_hit_from_str(enty_point, source);
+}
+
+#[pyfunction]
+pub fn set_compile_options(num_payload_values: u32) {
+    IR.backend().set_compile_options(&CompileOptions {
+        num_payload_values: num_payload_values as _,
+    });
 }
 
 #[pyfunction]
 pub fn set_backend(backend: &str) {
     IR.set_backend(backend)
+}
+
+#[pyfunction]
+pub fn eval() {
+    JIT.lock().eval(&mut IR.lock())
 }
 
 #[pyfunction]
@@ -40,11 +58,7 @@ macro_rules! initializer {
             #[pyfunction]
             // #[pyo3(signature = (*args))]
             pub fn $ty(value: &PyAny) -> PyResult<Var> {
-                if let Ok(lit) = value.extract::<$ty>() {
-                    Ok(Var(IR.[<literal_$ty>](lit)))
-                } else {
-                    Ok(Var(IR.[<buffer_$ty>](value.extract::<Vec<$ty>>()?.as_slice())))
-                }
+                Var::from_any_of(value, rjit::VarType::[<$ty:camel>])
             }
         }
     };
