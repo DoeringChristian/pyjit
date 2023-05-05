@@ -1,4 +1,4 @@
-use crate::funcs::IR;
+use crate::funcs::{self, IR};
 use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
 use pyo3::types::PyList;
@@ -32,48 +32,19 @@ impl Var {
     pub fn from_any_of(any: &PyAny, ty: VarType) -> PyResult<Self> {
         match ty {
             VarType::Void => todo!(),
-            VarType::Bool => {
-                match_return!(any, bool);
-            }
-            VarType::I8 => {
-                match_return!(any, i8);
-            }
-            VarType::U8 => {
-                match_return!(any, u8);
-            }
-            VarType::I16 => {
-                match_return!(any, i16);
-            }
-            VarType::U16 => {
-                match_return!(any, u16);
-            }
-            VarType::I32 => {
-                match_return!(any, i32);
-            }
-            VarType::U32 => {
-                match_return!(any, u32);
-            }
-            VarType::I64 => {
-                match_return!(any, i64);
-            }
-            VarType::U64 => {
-                match_return!(any, u64);
-            }
+            VarType::Bool => funcs::bool(any),
+            VarType::I8 => funcs::i8(any),
+            VarType::U8 => funcs::u8(any),
+            VarType::I16 => funcs::i16(any),
+            VarType::U16 => funcs::u16(any),
+            VarType::I32 => funcs::i32(any),
+            VarType::U32 => funcs::u32(any),
+            VarType::I64 => funcs::i64(any),
+            VarType::U64 => funcs::u64(any),
             VarType::F16 => todo!(),
-            VarType::F32 => {
-                match_return!(any, f32);
-            }
-            VarType::F64 => {
-                match_return!(any, f64);
-            }
+            VarType::F32 => funcs::f32(any),
+            VarType::F64 => funcs::f64(any),
         }
-        Err(PyErr::new::<PyTypeError, _>(
-            format!(
-                "Could not cast python object of type {} to type {:?}",
-                any.get_type().str().unwrap(),
-                ty
-            ), // "Could not cast python type to jit type!",
-        ))
     }
 }
 
@@ -192,26 +163,34 @@ impl Var {
     pub fn trace_ray(
         &self,
         payload_count: usize,
-        o: Vec<Self>,
-        d: Vec<Self>,
-        tmin: &Self,
-        tmax: &Self,
-        t: &Self,
-        vis_mask: Option<&Self>,
-        flags: Option<&Self>,
-        sbt_offset: Option<&Self>,
-        sbt_stride: Option<&Self>,
-        miss_sbt: Option<&Self>,
-        mask: Option<&Self>,
+        o: Vec<&PyAny>,
+        d: Vec<&PyAny>,
+        tmin: &PyAny,
+        tmax: &PyAny,
+        t: &PyAny,
+        vis_mask: Option<&PyAny>,
+        flags: Option<&PyAny>,
+        sbt_offset: Option<&PyAny>,
+        sbt_stride: Option<&PyAny>,
+        miss_sbt: Option<&PyAny>,
+        mask: Option<&PyAny>,
     ) -> PyResult<Vec<Self>> {
-        let o = [&o[0].0, &o[1].0, &o[2].0];
-        let d = [&d[0].0, &d[1].0, &d[2].0];
-        let vis_mask = vis_mask.map(|v| &v.0);
-        let flags = flags.map(|v| &v.0);
-        let sbt_offset = sbt_offset.map(|v| &v.0);
-        let sbt_stride = sbt_stride.map(|v| &v.0);
-        let miss_sbt = miss_sbt.map(|v| &v.0);
-        let mask = mask.map(|v| &v.0);
+        let o = [
+            &funcs::f32(o[0])?.0,
+            &funcs::f32(o[1])?.0,
+            &funcs::f32(o[2])?.0,
+        ];
+        let d = [
+            &funcs::f32(d[0])?.0,
+            &funcs::f32(d[1])?.0,
+            &funcs::f32(d[2])?.0,
+        ];
+        let vis_mask = vis_mask.map(|v| funcs::u32(v).unwrap().0);
+        let flags = flags.map(|v| funcs::u32(v).unwrap().0);
+        let sbt_offset = sbt_offset.map(|v| funcs::u32(v).unwrap().0);
+        let sbt_stride = sbt_stride.map(|v| funcs::u32(v).unwrap().0);
+        let miss_sbt = miss_sbt.map(|v| funcs::u32(v).unwrap().0);
+        let mask = mask.map(|v| funcs::bool(v).unwrap().0);
 
         Ok(self
             .0
@@ -219,15 +198,15 @@ impl Var {
                 payload_count,
                 o,
                 d,
-                &tmin.0,
-                &tmax.0,
-                &t.0,
-                vis_mask,
-                flags,
-                sbt_offset,
-                sbt_stride,
-                miss_sbt,
-                mask,
+                &funcs::f32(tmin)?.0,
+                &funcs::f32(tmax)?.0,
+                &funcs::f32(t)?.0,
+                vis_mask.as_ref(),
+                flags.as_ref(),
+                sbt_offset.as_ref(),
+                sbt_stride.as_ref(),
+                miss_sbt.as_ref(),
+                mask.as_ref(),
             )
             .into_iter()
             .map(|p| Var(p))

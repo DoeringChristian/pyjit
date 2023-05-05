@@ -56,11 +56,11 @@ accel: pyjit.Var = pyjit.accel(vertices, indices)
 
 payload: list[pyjit.Var] = accel.trace_ray(
     5,
-    [pyjit.f32([0.6, 0.6]), pyjit.f32(0.6), pyjit.f32(0.0)],
-    [pyjit.f32(0.0), pyjit.f32(0.0), pyjit.f32([1.0, -1.0])],
-    pyjit.f32(0.001),
-    pyjit.f32(1000.0),
-    pyjit.f32(0.0),
+    [[0.6, 0.6], 0.6, 0.0],
+    [0.0, 0.0, [1.0, 1.0]],
+    0.001,
+    1000.0,
+    0.0,
 )
 
 valid: pyjit.Var = pyjit.bool(payload[0])

@@ -1,6 +1,7 @@
 use super::var::Var;
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
+use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
 use pyo3::types::PyTuple;
 use rjit::backend::CompileOptions;
@@ -58,7 +59,27 @@ macro_rules! initializer {
             #[pyfunction]
             // #[pyo3(signature = (*args))]
             pub fn $ty(value: &PyAny) -> PyResult<Var> {
-                Var::from_any_of(value, rjit::VarType::[<$ty:camel>])
+                if let Ok(val) = value.extract::<Var>(){
+                    if val.0.ty() == rjit::VarType::[<$ty:camel>] {
+                        return Ok(val);
+                    } else {
+                        return Ok(Var(val.0.cast(&rjit::VarType::[<$ty:camel>])));
+                    }
+                }
+                if let Ok(val) = value.extract::<$ty>() {
+                    return Ok(Var(IR.[<literal_$ty>](val)));
+                }
+                if let Ok(val) = value.extract::<Vec<$ty>>() {
+                    return Ok(Var(IR.[<buffer_$ty>](&val)));
+                }
+
+                Err(PyErr::new::<PyTypeError, _>(
+                    format!(
+                        "Could not cast python object of type {} to type {:?}",
+                        value.get_type().str().unwrap(),
+                        &rjit::VarType::[<$ty:camel>]
+                    ), // "Could not cast python type to jit type!",
+                ))
             }
         }
     };
