@@ -66,6 +66,20 @@ payload: list[pyjit.Var] = accel.trace_ray(
 valid: pyjit.Var = pyjit.bool(payload[0])
 valid.schedule()
 
+primitive_idx = payload[1]
+instance_id = payload[2]
+primitive_idx.schedule()
+instance_id.schedule()
+
+u = payload[3].bitcast("f32")
+v = payload[4].bitcast("f32")
+u.schedule()
+v.schedule()
+
 pyjit.eval()
 
-print(f"{valid}")
+print(f"{valid=}")
+print(f"{primitive_idx=}")
+print(f"{instance_id=}")
+print(f"{u=}")
+print(f"{v=}")

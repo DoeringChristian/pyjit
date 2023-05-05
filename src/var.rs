@@ -128,6 +128,26 @@ impl Var {
         Ok(Var(self.0.log2()))
     }
 
+    pub fn bitcast(&self, ty: &str) -> PyResult<Self> {
+        let ty = ty.to_lowercase();
+        match ty.as_str() {
+            "bool" => Ok(Self(self.0.bitcast(&VarType::Bool))),
+            "u8" => Ok(Self(self.0.bitcast(&VarType::U8))),
+            "i8" => Ok(Self(self.0.bitcast(&VarType::I8))),
+            "i16" => Ok(Self(self.0.bitcast(&VarType::I16))),
+            "u16" => Ok(Self(self.0.bitcast(&VarType::U16))),
+            "i32" => Ok(Self(self.0.bitcast(&VarType::I32))),
+            "u32" => Ok(Self(self.0.bitcast(&VarType::U32))),
+            "i64" => Ok(Self(self.0.bitcast(&VarType::I64))),
+            "u64" => Ok(Self(self.0.bitcast(&VarType::U64))),
+            "f32" => Ok(Self(self.0.bitcast(&VarType::F32))),
+            "f64" => Ok(Self(self.0.bitcast(&VarType::F64))),
+            _ => Err(PyErr::new::<PyTypeError, _>(format!(
+                "Type {ty} is not supported!"
+            ))),
+        }
+    }
+
     pub fn to_texture(&self, shape: Vec<usize>, n_channels: usize) -> PyResult<Self> {
         Ok(Var(self.0.to_texture(&shape, n_channels)))
     }
