@@ -52,7 +52,11 @@ pyjit.push_hit("__closesthit__ch", miss_and_closesthit_ptx)
 indices = pyjit.u32([0, 1, 2])
 vertices = pyjit.f32([1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
-accel: pyjit.Var = pyjit.accel(vertices, indices)
+desc = pyjit.AccelDesc()
+t0 = desc.add_triangles(vertices, indices)
+desc.add_instance(t0, [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0])
+
+accel: pyjit.Var = pyjit.accel(desc)
 
 payload: list[pyjit.Var] = accel.trace_ray(
     5,

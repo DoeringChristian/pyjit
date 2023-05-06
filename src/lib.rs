@@ -17,6 +17,7 @@ mod var;
 fn pyjit(_py: Python, m: &PyModule) -> PyResult<()> {
     // m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
     m.add_class::<Var>()?;
+    m.add_class::<AccelDesc>()?;
 
     m.add_function(wrap_pyfunction!(funcs::bool, m)?)?;
     m.add_function(wrap_pyfunction!(funcs::i8, m)?)?;

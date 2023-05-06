@@ -48,9 +48,68 @@ pub fn texture(shape: Vec<usize>, n_channels: usize) -> Var {
     Var(IR.texture(&shape, n_channels))
 }
 
+enum GeometryDesc {
+    Triangles { vertices: Var, indices: Var },
+}
+struct InstanceDesc {
+    pub geometry: usize,
+    pub transform: [f32; 12],
+}
+
+#[pyclass]
+#[derive(Default)]
+pub struct AccelDesc {
+    geometries: Vec<GeometryDesc>,
+    instances: Vec<InstanceDesc>,
+}
+
+#[pymethods]
+impl AccelDesc {
+    #[new]
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn add_triangles(&mut self, vertices: &Var, indices: &Var) -> usize {
+        let id = self.geometries.len();
+        self.geometries.push(GeometryDesc::Triangles {
+            vertices: vertices.clone(),
+            indices: indices.clone(),
+        });
+        id
+    }
+    pub fn add_instance(&mut self, geometry: usize, transform: [f32; 12]) {
+        self.instances.push(InstanceDesc {
+            geometry,
+            transform,
+        })
+    }
+}
+
 #[pyfunction]
-pub fn accel(vertices: &Var, indices: &Var) -> Var {
-    Var(IR.accel(&vertices.0, &indices.0))
+pub fn accel(desc: &AccelDesc) -> Var {
+    let geometries = desc
+        .geometries
+        .iter()
+        .map(|g| match g {
+            GeometryDesc::Triangles { vertices, indices } => rjit::GeometryDesc::Triangles {
+                vertices: &vertices.0,
+                indices: &indices.0,
+            },
+        })
+        .collect::<Vec<_>>();
+    let instances = desc
+        .instances
+        .iter()
+        .map(|i| rjit::InstanceDesc {
+            geometry: i.geometry,
+            transform: i.transform,
+        })
+        .collect::<Vec<_>>();
+    let desc = rjit::AccelDesc {
+        geometries: &geometries,
+        instances: &instances,
+    };
+    Var(IR.accel(desc))
 }
 
 macro_rules! initializer {

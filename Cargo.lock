@@ -248,6 +248,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ad0a93d233ebf96623465aad4046a8d3aa4da22d4f4beba5388838c8a434bbb4"
 
 [[package]]
+name = "glam"
+version = "0.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ad83ab008a4fa3b31dfa713dd41b5a9bdea1e94e4cf1e2fc274ffbd49b0271d3"
+
+[[package]]
 name = "glob"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -700,7 +706,7 @@ checksum = "a5996294f19bd3aae0453a862ad728f60e6600695733dd5df01da90c54363a3c"
 [[package]]
 name = "rjit"
 version = "0.1.0"
-source = "git+https://github.com/DoeringChristian/cudajit#2488c39c1e401b2264955b73fa84e50819047f0a"
+source = "git+https://github.com/DoeringChristian/cudajit#1784320429be0454cbe5a2620521bcc11515064a"
 dependencies = [
  "approx",
  "bitflags 2.2.1",
@@ -708,6 +714,7 @@ dependencies = [
  "bytesize",
  "cuda-rs",
  "fasthash",
+ "glam",
  "half",
  "itertools",
  "libloading",
