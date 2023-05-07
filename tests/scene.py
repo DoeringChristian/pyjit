@@ -45,18 +45,6 @@ miss_and_closesthit_ptx = """
 """
 
 
-def sample_tea_32(
-    v0: pyjit.Var, v1: pyjit.Var, rounds=4
-) -> tuple[pyjit.Var, pyjit.Var]:
-    sum: pyjit.Var = pyjit.u32(0)
-    for i in range(rounds):
-        sum += 0x9E3779B9
-        v0 += (v1.shl(4) + 0xA341316C) ^ (v1 + sum) ^ (v1.shr(5) + 0xC8013EA4)
-        v1 += (v0.shl(4) + 0xAD90777D) ^ (v0 + sum) ^ (v0.shr(5) + 0x7E95761E)
-
-    return v0, v1
-
-
 class Scene:
     accel: pyjit.Var
 
