@@ -183,6 +183,43 @@ impl Var {
         Ok(Var(self.0.select(&d1.0, &d2.0)))
     }
 
+    pub fn __add__(&self, other: &PyAny) -> PyResult<Self> {
+        self.add(other)
+    }
+    pub fn __sub__(&self, other: &PyAny) -> PyResult<Self> {
+        self.sub(other)
+    }
+    pub fn __mul__(&self, other: &PyAny) -> PyResult<Self> {
+        self.mul(other)
+    }
+    pub fn __div__(&self, other: &PyAny) -> PyResult<Self> {
+        self.div(other)
+    }
+    pub fn __xor__(&self, other: &PyAny) -> PyResult<Self> {
+        self.xor(other)
+    }
+
+    pub fn __iadd__(&mut self, other: &PyAny) -> PyResult<()> {
+        *self = self.add(other)?;
+        Ok(())
+    }
+    pub fn __isub__(&mut self, other: &PyAny) -> PyResult<()> {
+        *self = self.sub(other)?;
+        Ok(())
+    }
+    pub fn __imul__(&mut self, other: &PyAny) -> PyResult<()> {
+        *self = self.mul(other)?;
+        Ok(())
+    }
+    pub fn __idiv__(&mut self, other: &PyAny) -> PyResult<()> {
+        *self = self.div(other)?;
+        Ok(())
+    }
+    pub fn __ixor__(&mut self, other: &PyAny) -> PyResult<()> {
+        *self = self.xor(other)?;
+        Ok(())
+    }
+
     pub fn bitcast(&self, ty: &str) -> PyResult<Self> {
         let ty = ty.to_lowercase();
         match ty.as_str() {
@@ -302,6 +339,8 @@ impl Var {
             .collect::<Vec<_>>())
     }
     pub fn __repr__(&self) -> String {
+        self.schedule();
+        funcs::eval();
         match self.0.ty() {
             VarType::Void => format!(""),
             VarType::Bool => format!("{:?}", self.0.to_host_bool().as_slice()),
