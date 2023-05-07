@@ -98,6 +98,90 @@ impl Var {
     pub fn log2(&self) -> PyResult<Self> {
         Ok(Var(self.0.log2()))
     }
+    pub fn neg(&self) -> PyResult<Self> {
+        Ok(Var(self.0.neg()))
+    }
+    pub fn not(&self) -> PyResult<Self> {
+        Ok(Var(self.0.not()))
+    }
+    pub fn abs(&self) -> PyResult<Self> {
+        Ok(Var(self.0.abs()))
+    }
+    pub fn ceil(&self) -> PyResult<Self> {
+        Ok(Var(self.0.floor()))
+    }
+    pub fn trunc(&self) -> PyResult<Self> {
+        Ok(Var(self.0.trunc()))
+    }
+    pub fn popc(&self) -> PyResult<Self> {
+        Ok(Var(self.0.popc()))
+    }
+    pub fn clz(&self) -> PyResult<Self> {
+        Ok(Var(self.0.clz()))
+    }
+    pub fn ctz(&self) -> PyResult<Self> {
+        Ok(Var(self.0.ctz()))
+    }
+    pub fn min(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.min(&other.0)))
+    }
+    pub fn max(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.max(&other.0)))
+    }
+    pub fn eq(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.eq(&other.0)))
+    }
+    pub fn neq(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.neq(&other.0)))
+    }
+    pub fn lt(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.lt(&other.0)))
+    }
+    pub fn le(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.le(&other.0)))
+    }
+    pub fn gt(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.gt(&other.0)))
+    }
+    pub fn ge(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.ge(&other.0)))
+    }
+
+    pub fn or(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.or(&other.0)))
+    }
+    pub fn xor(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.xor(&other.0)))
+    }
+    pub fn shl(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.shl(&other.0)))
+    }
+    pub fn shr(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.shr(&other.0)))
+    }
+
+    pub fn fma(&self, d1: &PyAny, d2: &PyAny) -> PyResult<Self> {
+        let d1 = Self::from_any_of(d1, self.0.ty())?;
+        let d2 = Self::from_any_of(d2, self.0.ty())?;
+        Ok(Var(self.0.fma(&d1.0, &d2.0)))
+    }
+    pub fn select(&self, d1: &PyAny, d2: &PyAny) -> PyResult<Self> {
+        let d1 = Self::from_any_of(d1, self.0.ty())?;
+        let d2 = Self::from_any_of(d2, self.0.ty())?;
+        Ok(Var(self.0.select(&d1.0, &d2.0)))
+    }
 
     pub fn bitcast(&self, ty: &str) -> PyResult<Self> {
         let ty = ty.to_lowercase();
