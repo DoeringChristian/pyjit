@@ -69,13 +69,15 @@ impl AccelDesc {
     pub fn new() -> Self {
         Self::default()
     }
-    pub fn add_triangles(&mut self, vertices: &Var, indices: &Var) -> usize {
+    pub fn add_triangles(&mut self, vertices: &PyAny, indices: &PyAny) -> PyResult<usize> {
+        let vertices = f32(vertices)?;
+        let indices = u32(indices)?;
         let id = self.geometries.len();
         self.geometries.push(GeometryDesc::Triangles {
             vertices: vertices.clone(),
             indices: indices.clone(),
         });
-        id
+        Ok(id)
     }
     pub fn add_instance(&mut self, geometry: usize, transform: [f32; 12]) {
         self.instances.push(InstanceDesc {
