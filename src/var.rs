@@ -195,6 +195,12 @@ impl Var {
     pub fn __div__(&self, other: &PyAny) -> PyResult<Self> {
         self.div(other)
     }
+    pub fn __or__(&self, other: &PyAny) -> PyResult<Self> {
+        self.or(other)
+    }
+    pub fn __and__(&self, other: &PyAny) -> PyResult<Self> {
+        self.and(other)
+    }
     pub fn __xor__(&self, other: &PyAny) -> PyResult<Self> {
         self.xor(other)
     }
@@ -213,6 +219,14 @@ impl Var {
     }
     pub fn __idiv__(&mut self, other: &PyAny) -> PyResult<()> {
         *self = self.div(other)?;
+        Ok(())
+    }
+    pub fn __ior__(&mut self, other: &PyAny) -> PyResult<()> {
+        *self = self.or(other)?;
+        Ok(())
+    }
+    pub fn __iand__(&mut self, other: &PyAny) -> PyResult<()> {
+        *self = self.and(other)?;
         Ok(())
     }
     pub fn __ixor__(&mut self, other: &PyAny) -> PyResult<()> {
