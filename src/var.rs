@@ -162,7 +162,7 @@ impl Var {
     }
     pub fn trace_ray(
         &self,
-        payload_count: usize,
+        payload: Vec<&PyAny>,
         o: Vec<&PyAny>,
         d: Vec<&PyAny>,
         tmin: &PyAny,
@@ -191,11 +191,16 @@ impl Var {
         let sbt_stride = sbt_stride.map(|v| funcs::u32(v).unwrap().0);
         let miss_sbt = miss_sbt.map(|v| funcs::u32(v).unwrap().0);
         let mask = mask.map(|v| funcs::bool(v).unwrap().0);
+        let payload = payload
+            .into_iter()
+            .map(|v| funcs::u32(v).unwrap().0)
+            .collect::<Vec<_>>();
+        let payload_ref = payload.iter().collect::<Vec<_>>();
 
         Ok(self
             .0
             .trace_ray(
-                payload_count,
+                &payload_ref,
                 o,
                 d,
                 &funcs::f32(tmin)?.0,
