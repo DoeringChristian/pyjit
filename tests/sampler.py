@@ -11,7 +11,7 @@ def register_sampler(name: str, init):
 
 
 def new_sampler(desc: dict):
-    return samplers[desc.pop("type")](desc)
+    return samplers[desc.pop("type")](desc.copy())
 
 
 class Sampler:

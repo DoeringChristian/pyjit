@@ -1,12 +1,8 @@
 import pyjit
 from typing import Any
-from sensor import Sensor, sensors
-
-shapes = {}
-
-
-def register_shape(name: str, init):
-    shapes[name] = init
+from sensor import Sensor, sensors, new_sensor
+from shape import Shape, Instance, shapes, new_shape
+from integrator import Integrator, integrators, new_integrator
 
 
 miss_and_closesthit_ptx = """
@@ -56,30 +52,33 @@ miss_and_closesthit_ptx = """
 class Scene:
     accel: pyjit.Var
     sensors: list[Sensor] = []
+    shapes: list[Shape] = []
+    instances: list[Instance] = []
+    integrators: list[Integrator] = []
 
     def __init__(self, desc: dict[str, Any]):
         pyjit.set_compile_options(5)
         pyjit.set_miss("__miss__ms", miss_and_closesthit_ptx)
         pyjit.push_hit("__closesthit__ch", miss_and_closesthit_ptx)
 
-        adesc = pyjit.AccelDesc()
-        k2g = {}
+        self.acceldesc = pyjit.AccelDesc()
+        geometries = {}
         for k, v in desc.items():
-            if v["type"] == "mesh":
-                k2g[k] = adesc.add_triangles(
-                    vertices=v["vertices"],
-                    indices=v["indices"],
-                )
-
+            if v["type"] in shapes:
+                shape = new_shape(v.copy())
+                geometries[k] = shape.add_to_accel(self.acceldesc)
+                self.shapes.append(shape)
         for k, v in desc.items():
             if v["type"] == "instance":
-                adesc.add_instance(geometry=k2g[v["ref"]], transform=v["to_world"])
+                self.instances.append(Instance(geometries, self.acceldesc, v.copy()))
 
         for k, v in desc.items():
-            if sensors[v["type"]] is not None:
-                self.sensors.append(sensors[v["type"]](v))
+            if v["type"] in sensors:
+                self.sensors.append(new_sensor(v.copy()))
+            if v["type"] in integrators:
+                self.integrators.append(new_integrator(v.copy()))
 
-        self.accel = pyjit.accel(adesc)
+        self.accel = pyjit.accel(self.acceldesc)
 
 
 if __name__ == "__main__":
@@ -94,20 +93,14 @@ if __name__ == "__main__":
             "i0": {
                 "type": "instance",
                 "ref": "m0",
-                "to_world": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                ],
+            },
+            "integrator": {
+                "type": "path",
+            },
+            "sensor": {
+                "type": "orthogonal",
             },
         }
     )
+
+    print(f"{scene.sensors=}")
