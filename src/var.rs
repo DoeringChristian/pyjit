@@ -388,4 +388,21 @@ impl Var {
             VarType::F64 => PyList::new(py, self.0.to_host_f64()),
         }
     }
+    pub fn to_numpy<'a>(&self, py: Python<'a>) -> &'a PyAny {
+        match self.0.ty() {
+            VarType::Void => todo!(),
+            VarType::Bool => numpy::PyArray1::from_vec(py, self.0.to_host_bool()),
+            VarType::I8 => numpy::PyArray1::from_vec(py, self.0.to_host_i8()),
+            VarType::U8 => numpy::PyArray1::from_vec(py, self.0.to_host_u8()),
+            VarType::I16 => numpy::PyArray1::from_vec(py, self.0.to_host_i16()),
+            VarType::U16 => numpy::PyArray1::from_vec(py, self.0.to_host_u16()),
+            VarType::I32 => numpy::PyArray1::from_vec(py, self.0.to_host_i32()),
+            VarType::U32 => numpy::PyArray1::from_vec(py, self.0.to_host_u32()),
+            VarType::I64 => numpy::PyArray1::from_vec(py, self.0.to_host_i64()),
+            VarType::U64 => numpy::PyArray1::from_vec(py, self.0.to_host_u64()),
+            VarType::F16 => todo!(),
+            VarType::F32 => numpy::PyArray1::from_vec(py, self.0.to_host_f32()),
+            VarType::F64 => numpy::PyArray1::from_vec(py, self.0.to_host_f64()),
+        }
+    }
 }
