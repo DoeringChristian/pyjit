@@ -129,11 +129,11 @@ macro_rules! initializer {
                 if let Ok(val) = value.extract::<$ty>() {
                     return Ok(Var(IR.[<literal_$ty>](val)));
                 }
-                if let Ok(val) = value.extract::<numpy::PyReadonlyArray1<$ty>>() {
-                    return Ok(Var(IR.[<buffer_$ty>](&val.to_vec()?)));
-                }
                 if let Ok(val) = value.extract::<Vec<$ty>>() {
                     return Ok(Var(IR.[<buffer_$ty>](&val)));
+                }
+                if let Ok(val) = value.extract::<numpy::PyReadonlyArray1<$ty>>() {
+                    return Ok(Var(IR.[<buffer_$ty>](&val.to_vec()?)));
                 }
 
                 Err(PyErr::new::<PyTypeError, _>(

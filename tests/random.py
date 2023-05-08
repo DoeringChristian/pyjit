@@ -20,6 +20,32 @@ def sample_tea_64(v0: pyjit.Var, v1: pyjit.Var, rounds=4) -> pyjit.Var:
     return pyjit.u64(v0) + pyjit.u64(v1).shl(32)
 
 
+PCG32_DEFAULT_STATE = 0x853C49E6748FEA9B
+PCG32_DEFAULT_STREAM = 0xDA3E39CB94B95BDB
+PCG32_MULT = 0x5851F42D4C957F2D
+
+
+class PCG32:
+    def __init__(
+        self, size=1, initstate=PCG32_DEFAULT_STATE, initseq=PCG32_DEFAULT_STREAM
+    ):
+        self.state = pyjit.u64(0)
+        self.inc = (pyjit.u64(initseq) + pyjit.u64(pyjit.index(size))).shl(1) | 1
+        self.next_u32()
+        self.state += initstate
+        self.next_u32()
+
+    def next_u32(self) -> pyjit.Var:
+        oldstate = self.state
+
+        self.state: pyjit.Var = oldstate.fma(pyjit.u64(PCG32_MULT), self.inc)
+
+        xorshift = pyjit.u32((oldstate.shr(18) ^ oldstate).shr(27))
+        rot = oldstate.shr(59)
+
+        return xorshift.shr(rot) | (xorshift.shl(pyjit.i32(rot).neg() & 31))
+
+
 if __name__ == "__main__":
     mi.set_variant("cuda_ad_rgb")
 
@@ -53,3 +79,11 @@ if __name__ == "__main__":
     v = sample_tea_64(v0, v1)
 
     print(f"{v=}")
+
+    rng = PCG32(10)
+
+    print(f"own: {rng.next_u32()=}")
+
+    rng = mi.PCG32(10)
+
+    print(f"mitsuba: {rng.next_uint32()=}")
