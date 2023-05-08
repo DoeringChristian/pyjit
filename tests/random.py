@@ -45,9 +45,22 @@ class PCG32:
 
         return xorshift.shr(rot) | (xorshift.shl(pyjit.i32(rot).neg() & 31))
 
+    def next_u64(self) -> pyjit.Var:
+        v0 = self.next_u32()
+        v1 = self.next_u32()
+
+        return pyjit.u64(v0) | pyjit.u64(v1).shl(32)
+
+    def next_f32(self) -> pyjit.Var:
+        return (self.next_u32().shr(9) | 0x3F800000).bitcast("f32") - 1.0
+
+    def next_f64(self) -> pyjit.Var:
+        return (self.next_u64().shr(9) | 0x3FF0000000000000).bitcast("f64") - 1.0
+
 
 if __name__ == "__main__":
     mi.set_variant("cuda_ad_rgb")
+    # dr.set_log_level(dr.LogLevel.Trace)
 
     m_v0 = mi.UInt32([0, 1, 2, 3])
     m_v1 = mi.UInt32([4, 5, 6, 7])
@@ -83,7 +96,10 @@ if __name__ == "__main__":
     rng = PCG32(10)
 
     print(f"own: {rng.next_u32()=}")
+    print(f"onw: {rng.next_f32()=}")
 
     rng = mi.PCG32(10)
 
     print(f"mitsuba: {rng.next_uint32()=}")
+    print(f"mitsuba: {rng.next_float32()=}")
+    # print(f"{(rng.next_uint32() | 0x3F800000) >> 9}")
