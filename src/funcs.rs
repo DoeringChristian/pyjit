@@ -3,6 +3,7 @@ use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
+use pyo3::types::{PyDict, PyTuple};
 use rjit::backend::CompileOptions;
 use rjit::{Jit, Trace};
 
@@ -69,8 +70,8 @@ impl AccelDesc {
         Self::default()
     }
     pub fn add_triangles(&mut self, vertices: &PyAny, indices: &PyAny) -> PyResult<usize> {
-        let vertices = f32(vertices)?;
-        let indices = u32(indices)?;
+        let vertices = f32(vertices, None)?;
+        let indices = u32(indices, None)?;
         let id = self.geometries.len();
         self.geometries.push(GeometryDesc::Triangles {
             vertices: vertices.clone(),
@@ -117,8 +118,7 @@ macro_rules! initializer {
     ($ty:ident) => {
         paste::paste! {
             #[pyfunction]
-            // #[pyo3(signature = (*args))]
-            pub fn $ty(value: &PyAny) -> PyResult<Var> {
+            pub fn $ty(value: &PyAny, num: Option<usize>) -> PyResult<Var> {
                 if let Ok(val) = value.extract::<Var>(){
                     if val.0.ty() == rjit::VarType::[<$ty:camel>] {
                         return Ok(val);
@@ -127,13 +127,13 @@ macro_rules! initializer {
                     }
                 }
                 if let Ok(val) = value.extract::<$ty>() {
-                    return Ok(Var(IR.[<literal_$ty>](val)));
+                    return Ok(Var(IR.sized_literal::<$ty>(val, num.unwrap_or(1))));
                 }
                 if let Ok(val) = value.extract::<Vec<$ty>>() {
-                    return Ok(Var(IR.[<buffer_$ty>](&val)));
+                    return Ok(Var(IR.array(&val)));
                 }
                 if let Ok(val) = value.extract::<numpy::PyReadonlyArray1<$ty>>() {
-                    return Ok(Var(IR.[<buffer_$ty>](&val.to_vec()?)));
+                    return Ok(Var(IR.array(&val.to_vec()?)));
                 }
 
                 Err(PyErr::new::<PyTypeError, _>(

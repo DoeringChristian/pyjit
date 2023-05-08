@@ -3,18 +3,17 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Vector2f:
+class Point2f:
     x: pyjit.Var
     y: pyjit.Var
 
     def __init__(self, x, y):
         self.x = pyjit.f32(x)
         self.y = pyjit.f32(y)
-        self.y = pyjit.f32(y)
 
 
 @dataclass
-class Vector3f:
+class Point3f:
     x: pyjit.Var
     y: pyjit.Var
     z: pyjit.Var

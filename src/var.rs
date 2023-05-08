@@ -32,18 +32,18 @@ impl Var {
     pub fn from_any_of(any: &PyAny, ty: VarType) -> PyResult<Self> {
         match ty {
             VarType::Void => todo!(),
-            VarType::Bool => funcs::bool(any),
-            VarType::I8 => funcs::i8(any),
-            VarType::U8 => funcs::u8(any),
-            VarType::I16 => funcs::i16(any),
-            VarType::U16 => funcs::u16(any),
-            VarType::I32 => funcs::i32(any),
-            VarType::U32 => funcs::u32(any),
-            VarType::I64 => funcs::i64(any),
-            VarType::U64 => funcs::u64(any),
+            VarType::Bool => funcs::bool(any, None),
+            VarType::I8 => funcs::i8(any, None),
+            VarType::U8 => funcs::u8(any, None),
+            VarType::I16 => funcs::i16(any, None),
+            VarType::U16 => funcs::u16(any, None),
+            VarType::I32 => funcs::i32(any, None),
+            VarType::U32 => funcs::u32(any, None),
+            VarType::I64 => funcs::i64(any, None),
+            VarType::U64 => funcs::u64(any, None),
             VarType::F16 => todo!(),
-            VarType::F32 => funcs::f32(any),
-            VarType::F64 => funcs::f64(any),
+            VarType::F32 => funcs::f32(any, None),
+            VarType::F64 => funcs::f64(any, None),
         }
     }
 }
@@ -311,24 +311,24 @@ impl Var {
         mask: Option<&PyAny>,
     ) -> PyResult<Vec<Self>> {
         let o = [
-            &funcs::f32(o[0])?.0,
-            &funcs::f32(o[1])?.0,
-            &funcs::f32(o[2])?.0,
+            &funcs::f32(o[0], None)?.0,
+            &funcs::f32(o[1], None)?.0,
+            &funcs::f32(o[2], None)?.0,
         ];
         let d = [
-            &funcs::f32(d[0])?.0,
-            &funcs::f32(d[1])?.0,
-            &funcs::f32(d[2])?.0,
+            &funcs::f32(d[0], None)?.0,
+            &funcs::f32(d[1], None)?.0,
+            &funcs::f32(d[2], None)?.0,
         ];
-        let vis_mask = vis_mask.map(|v| funcs::u32(v).unwrap().0);
-        let flags = flags.map(|v| funcs::u32(v).unwrap().0);
-        let sbt_offset = sbt_offset.map(|v| funcs::u32(v).unwrap().0);
-        let sbt_stride = sbt_stride.map(|v| funcs::u32(v).unwrap().0);
-        let miss_sbt = miss_sbt.map(|v| funcs::u32(v).unwrap().0);
-        let mask = mask.map(|v| funcs::bool(v).unwrap().0);
+        let vis_mask = vis_mask.map(|v| funcs::u32(v, None).unwrap().0);
+        let flags = flags.map(|v| funcs::u32(v, None).unwrap().0);
+        let sbt_offset = sbt_offset.map(|v| funcs::u32(v, None).unwrap().0);
+        let sbt_stride = sbt_stride.map(|v| funcs::u32(v, None).unwrap().0);
+        let miss_sbt = miss_sbt.map(|v| funcs::u32(v, None).unwrap().0);
+        let mask = mask.map(|v| funcs::bool(v, None).unwrap().0);
         let payload = payload
             .into_iter()
-            .map(|v| funcs::u32(v).unwrap().0)
+            .map(|v| funcs::u32(v, None).unwrap().0)
             .collect::<Vec<_>>();
         let payload_ref = payload.iter().collect::<Vec<_>>();
 
@@ -338,9 +338,9 @@ impl Var {
                 &payload_ref,
                 o,
                 d,
-                &funcs::f32(tmin)?.0,
-                &funcs::f32(tmax)?.0,
-                &funcs::f32(t)?.0,
+                &funcs::f32(tmin, None)?.0,
+                &funcs::f32(tmax, None)?.0,
+                &funcs::f32(t, None)?.0,
                 vis_mask.as_ref(),
                 flags.as_ref(),
                 sbt_offset.as_ref(),
@@ -391,18 +391,18 @@ impl Var {
     pub fn to_numpy<'a>(&self, py: Python<'a>) -> &'a PyAny {
         match self.0.ty() {
             VarType::Void => todo!(),
-            VarType::Bool => numpy::PyArray1::from_vec(py, self.0.to_host_bool()),
-            VarType::I8 => numpy::PyArray1::from_vec(py, self.0.to_host_i8()),
-            VarType::U8 => numpy::PyArray1::from_vec(py, self.0.to_host_u8()),
-            VarType::I16 => numpy::PyArray1::from_vec(py, self.0.to_host_i16()),
-            VarType::U16 => numpy::PyArray1::from_vec(py, self.0.to_host_u16()),
-            VarType::I32 => numpy::PyArray1::from_vec(py, self.0.to_host_i32()),
-            VarType::U32 => numpy::PyArray1::from_vec(py, self.0.to_host_u32()),
-            VarType::I64 => numpy::PyArray1::from_vec(py, self.0.to_host_i64()),
-            VarType::U64 => numpy::PyArray1::from_vec(py, self.0.to_host_u64()),
+            VarType::Bool => numpy::PyArray1::<bool>::from_vec(py, self.0.to_host_bool()),
+            VarType::I8 => numpy::PyArray1::<i8>::from_vec(py, self.0.to_host_i8()),
+            VarType::U8 => numpy::PyArray1::<u8>::from_vec(py, self.0.to_host_u8()),
+            VarType::I16 => numpy::PyArray1::<i16>::from_vec(py, self.0.to_host_i16()),
+            VarType::U16 => numpy::PyArray1::<u16>::from_vec(py, self.0.to_host_u16()),
+            VarType::I32 => numpy::PyArray1::<i32>::from_vec(py, self.0.to_host_i32()),
+            VarType::U32 => numpy::PyArray1::<u32>::from_vec(py, self.0.to_host_u32()),
+            VarType::I64 => numpy::PyArray1::<i64>::from_vec(py, self.0.to_host_i64()),
+            VarType::U64 => numpy::PyArray1::<u64>::from_vec(py, self.0.to_host_u64()),
             VarType::F16 => todo!(),
-            VarType::F32 => numpy::PyArray1::from_vec(py, self.0.to_host_f32()),
-            VarType::F64 => numpy::PyArray1::from_vec(py, self.0.to_host_f64()),
+            VarType::F32 => numpy::PyArray1::<f32>::from_vec(py, self.0.to_host_f32()),
+            VarType::F64 => numpy::PyArray1::<f64>::from_vec(py, self.0.to_host_f64()),
         }
     }
 }

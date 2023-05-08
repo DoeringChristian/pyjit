@@ -1,5 +1,13 @@
 import pyjit
 from typing import Any
+from sensor import Sensor, sensors
+
+shapes = {}
+
+
+def register_shape(name: str, init):
+    shapes[name] = init
+
 
 miss_and_closesthit_ptx = """
 .version 8.0
@@ -47,6 +55,7 @@ miss_and_closesthit_ptx = """
 
 class Scene:
     accel: pyjit.Var
+    sensors: list[Sensor] = []
 
     def __init__(self, desc: dict[str, Any]):
         pyjit.set_compile_options(5)
@@ -65,6 +74,10 @@ class Scene:
         for k, v in desc.items():
             if v["type"] == "instance":
                 adesc.add_instance(geometry=k2g[v["ref"]], transform=v["to_world"])
+
+        for k, v in desc.items():
+            if sensors[v["type"]] is not None:
+                self.sensors.append(sensors[v["type"]](v))
 
         self.accel = pyjit.accel(adesc)
 
