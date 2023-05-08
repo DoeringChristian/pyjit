@@ -5,8 +5,12 @@ from point import Point2f
 films = {}
 
 
-def register_sensor(name: str, init):
+def register_film(name: str, init):
     films[name] = init
+
+
+def new_film(desc: dict):
+    return films[desc.pop("type")](desc)
 
 
 class Film:
@@ -22,3 +26,9 @@ class Film:
                 (pos.x + pos.y * self.tensor.shape[1]) * self.tensor.shape[2] + i,
                 mask=active,
             )
+
+    def crop_size(self) -> (int, int):
+        """
+        Return width, height
+        """
+        return self.tensor.shape[1], self.tensor.shape[0]

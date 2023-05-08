@@ -3,6 +3,16 @@ from typing import Any
 from rand import PCG32, sample_tea_32
 from point import Point2f
 
+samplers = {}
+
+
+def register_sampler(name: str, init):
+    samplers[name] = init
+
+
+def new_sampler(desc: dict):
+    return samplers[desc.pop("type")](desc)
+
 
 class Sampler:
     def __init__(self, desc: dict[str, Any]):
@@ -66,6 +76,8 @@ class Independent(Sampler):
     def next_2d(self) -> Point2f:
         return Point2f(self.rng.next_f32(), self.rng.next_f32())
 
+
+register_sampler("independent", lambda desc: Independent(desc))
 
 if __name__ == "__main__":
     pyjit.set_backend("optix")

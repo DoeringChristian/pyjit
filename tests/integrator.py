@@ -14,6 +14,14 @@ class Integrator:
     def render(self, scene: Scene) -> TensorXf:
         sensor = scene.sensors[0]
 
+        film = sensor.film()
+
+        size = film.crop_size()
+
+        wavefront_size = size[0] * size[1]
+
+        sampler = sensor.sampler()
+
         # return res
 
 
