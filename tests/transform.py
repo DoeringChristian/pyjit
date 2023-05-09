@@ -10,7 +10,7 @@ from vector import Vector4f
 class Matrix4f:
     def __init__(self, arg):
         if isinstance(arg, Matrix4f):
-            self.cols = copy.deepcopy(arg)
+            self.cols = copy.deepcopy(arg.cols)
         elif isinstance(arg, list):
             self.cols = [[e for e in col] for col in arg]
 

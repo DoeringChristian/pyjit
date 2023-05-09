@@ -10,7 +10,6 @@ class Vector2f:
     def __init__(self, x, y):
         self.x = pyjit.f32(x)
         self.y = pyjit.f32(y)
-        self.y = pyjit.f32(y)
 
 
 @dataclass

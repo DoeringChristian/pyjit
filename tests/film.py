@@ -24,10 +24,12 @@ class Film:
         self.tensor = TensorXf(0.0, [self.height, self.width, self.n_channels])
 
     def put(self, pos: Point2f, spec: list[pyjit.Var], active=True):
+        x = pos.x * self.width
+        y = pos.y * self.height
         for i, s in enumerate(spec):
             pyjit.f32(s).scatter(
                 self.tensor.data,
-                (pos.x + pos.y * self.tensor.shape[1]) * self.tensor.shape[2] + i,
+                (x + y * self.tensor.shape[1]) * self.tensor.shape[2] + i,
                 mask=active,
             )
 

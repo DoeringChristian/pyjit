@@ -3,6 +3,9 @@ from typing import Any
 from sensor import Sensor, sensors, new_sensor
 from shape import Shape, Instance, shapes, new_shape
 from integrator import Integrator, integrators, new_integrator
+from ray import Ray3f
+from point import Point3f, Point2f
+from dataclasses import dataclass
 
 
 miss_and_closesthit_ptx = """
@@ -49,6 +52,14 @@ miss_and_closesthit_ptx = """
 """
 
 
+@dataclass
+class PreliminaryInteraction:
+    valid: pyjit.Var
+    primitive_idx: pyjit.Var
+    instance_id: pyjit.Var
+    uv: Point2f
+
+
 class Scene:
     accel: pyjit.Var
     sensors: list[Sensor] = []
@@ -78,7 +89,23 @@ class Scene:
             if v["type"] in integrators:
                 self.integrators.append(new_integrator(v.copy()))
 
-        self.accel = pyjit.accel(self.acceldesc)
+        self.accel: pyjit.Var = pyjit.accel(self.acceldesc)
+
+    def intersect_preliminary(self, ray: Ray3f):
+        payload = self.accel.trace_ray(
+            [0, 0, 0, 0, 0],
+            [ray.o.x, ray.o.y, ray.o.z],
+            [ray.d.x, ray.d.y, ray.d.z],
+            0.0001,
+            1000.0,
+            0.0,
+        )
+        return PreliminaryInteraction(
+            pyjit.bool(payload[0]),
+            payload[1],
+            payload[2],
+            Point2f(payload[3].bitcast("f32"), payload[4].bitcast("f32")),
+        )
 
 
 if __name__ == "__main__":
@@ -103,4 +130,11 @@ if __name__ == "__main__":
         }
     )
 
-    print(f"{scene.sensors=}")
+    result = scene.integrators[0].render(scene)
+
+    import matplotlib.pyplot as plt
+
+    plt.imshow(result.to_numpy())
+    plt.show()
+
+    # print(f"{scene.sensors=}")
