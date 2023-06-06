@@ -76,6 +76,10 @@ impl Var {
         let other = Self::from_any_of(other, self.0.ty())?;
         Ok(Var(self.0.div(&other.0)))
     }
+    pub fn modulo(&self, other: &PyAny) -> PyResult<Self> {
+        let other = Self::from_any_of(other, self.0.ty())?;
+        Ok(Var(self.0.modulo(&other.0)))
+    }
     pub fn and(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
         Ok(Var(self.0.and(&other.0)))
@@ -357,18 +361,18 @@ impl Var {
         funcs::eval();
         match self.0.ty() {
             VarType::Void => format!(""),
-            VarType::Bool => format!("{:?}", self.0.to_host_bool().as_slice()),
-            VarType::I8 => format!("{:?}", self.0.to_host_i8().as_slice()),
-            VarType::U8 => format!("{:?}", self.0.to_host_u8().as_slice()),
-            VarType::I16 => format!("{:?}", self.0.to_host_i16().as_slice()),
-            VarType::U16 => format!("{:?}", self.0.to_host_u16().as_slice()),
-            VarType::I32 => format!("{:?}", self.0.to_host_i32().as_slice()),
-            VarType::U32 => format!("{:?}", self.0.to_host_u32().as_slice()),
-            VarType::I64 => format!("{:?}", self.0.to_host_i64().as_slice()),
-            VarType::U64 => format!("{:?}", self.0.to_host_u64().as_slice()),
+            VarType::Bool => format!("bool{:?}", self.0.to_host_bool().as_slice()),
+            VarType::I8 => format!("i8{:?}", self.0.to_host_i8().as_slice()),
+            VarType::U8 => format!("u8{:?}", self.0.to_host_u8().as_slice()),
+            VarType::I16 => format!("i16{:?}", self.0.to_host_i16().as_slice()),
+            VarType::U16 => format!("u16{:?}", self.0.to_host_u16().as_slice()),
+            VarType::I32 => format!("i32{:?}", self.0.to_host_i32().as_slice()),
+            VarType::U32 => format!("u32{:?}", self.0.to_host_u32().as_slice()),
+            VarType::I64 => format!("i64{:?}", self.0.to_host_i64().as_slice()),
+            VarType::U64 => format!("u64{:?}", self.0.to_host_u64().as_slice()),
             VarType::F16 => todo!(),
-            VarType::F32 => format!("{:?}", self.0.to_host_f32().as_slice()),
-            VarType::F64 => format!("{:?}", self.0.to_host_f64().as_slice()),
+            VarType::F32 => format!("f32{:?}", self.0.to_host_f32().as_slice()),
+            VarType::F64 => format!("f64{:?}", self.0.to_host_f64().as_slice()),
         }
     }
     pub fn to_list<'a>(&self, py: Python<'a>) -> &'a PyList {

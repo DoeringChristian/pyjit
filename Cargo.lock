@@ -770,7 +770,7 @@ checksum = "a5996294f19bd3aae0453a862ad728f60e6600695733dd5df01da90c54363a3c"
 [[package]]
 name = "rjit"
 version = "0.1.0"
-source = "git+https://github.com/DoeringChristian/cudajit#3f067f8732d8ee91778d730afb03d6f655c08795"
+source = "git+https://github.com/DoeringChristian/cudajit#993b2a6b7efb45d5415f1b6621b0a443bc81afd6"
 dependencies = [
  "approx",
  "bitflags 2.2.1",

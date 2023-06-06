@@ -24,8 +24,8 @@ class Film:
         self.tensor = TensorXf(0.0, [self.height, self.width, self.n_channels])
 
     def put(self, pos: Point2f, spec: list[pyjit.Var], active=True):
-        x = pos.x * self.width
-        y = pos.y * self.height
+        x = pyjit.u32(pos.x * self.width)
+        y = pyjit.u32(pos.y * self.height)
         for i, s in enumerate(spec):
             pyjit.f32(s).scatter(
                 self.tensor.data,
@@ -33,7 +33,7 @@ class Film:
                 mask=active,
             )
 
-    def crop_size(self) -> (int, int):
+    def crop_size(self) -> tuple[int, int]:
         """
         Return width, height
         """

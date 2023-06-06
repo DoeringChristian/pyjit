@@ -47,20 +47,27 @@ class PathIntegrator(Integrator):
 
         idx = pyjit.index(wavefront_size)
         pos = Point2f(0.0, 0.0)
-        pos.y = idx.div(pyjit.f32(size[0]))
-        pos.x = pos.y.fma(pyjit.f32(-size[0]), idx)
+        pos.y = pyjit.f32(idx.div(pyjit.f32(size[0])))
+        pos.x = pyjit.f32(idx.modulo(pyjit.f32(size[0])))
+        print(f"{pos=}")
+        # pos.x = pos.y.fma(pyjit.f32(-size[0]), idx)
 
         offset = sampler.next_2d()
+        # offset = Point2f(0.0, 0.0)
         sample_pos = Point2f(
             (pos.x + offset.x).div(pyjit.f32(size[0])),
-            (pos.y + offset.x).div(pyjit.f32(size[1])),
+            (pos.y + offset.y).div(pyjit.f32(size[1])),
         )
+        print(f"{sample_pos=}")
 
-        ray = sensor.sample_ray(0.0, 0.0, pos, Point2f(0, 0))
+        ray = sensor.sample_ray(0.0, 0.0, sample_pos, Point2f(0, 0))
+        # print(f"{ray.o=}")
 
         pi = scene.intersect_preliminary(ray)
 
-        film.put(pos, [pi.uv.x, pi.uv.y, 0.00])
+        print(f"{pi.valid=}")
+
+        film.put(sample_pos, [1.0, 0.0, 0.00], pi.valid)
 
         pyjit.eval()
 

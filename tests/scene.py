@@ -126,6 +126,11 @@ if __name__ == "__main__":
             },
             "sensor": {
                 "type": "orthogonal",
+                "film": {
+                    "type": "hdrfilm",
+                    "width": 10,
+                    "height": 10,
+                },
             },
         }
     )
