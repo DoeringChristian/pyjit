@@ -15,6 +15,7 @@ mod var;
 /// A Python module implemented in Rust.
 #[pymodule]
 fn pyjit(_py: Python, m: &PyModule) -> PyResult<()> {
+    pyo3_log::init();
     // m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
     m.add_class::<Var>()?;
     m.add_class::<AccelDesc>()?;

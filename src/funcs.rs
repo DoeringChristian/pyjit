@@ -9,8 +9,6 @@ use rjit::{Jit, Trace};
 
 pub static IR: Lazy<Trace> = Lazy::new(|| Trace::default());
 
-static JIT: Lazy<Mutex<Jit>> = Lazy::new(|| Mutex::new(Jit::default()));
-
 #[pyfunction]
 pub fn set_miss(enty_point: &str, source: &str) {
     IR.backend().set_miss_from_str(enty_point, source);
@@ -35,7 +33,7 @@ pub fn set_backend(backend: &str) {
 
 #[pyfunction]
 pub fn eval() {
-    JIT.lock().eval(&mut IR.lock())
+    IR.eval();
 }
 
 #[pyfunction]
