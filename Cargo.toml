@@ -9,11 +9,12 @@ name = "pyjit"
 crate-type = ["cdylib"]
 
 [dependencies]
+anyhow = { version = "1.0.71", features = ["backtrace"] }
 numpy = "0.18.0"
 once_cell = "1.17.1"
 parking_lot = "0.12.1"
 paste = "1.0.12"
-pyo3 = { version = "0.18.0", features = ["extension-module"] }
+pyo3 = { version = "0.18.0", features = ["extension-module", "anyhow"] }
 pyo3-log = "0.8.2"
 # rjit = { git = "https://github.com/DoeringChristian/cudajit" }
 rjit = { path = "../cuda-test" }

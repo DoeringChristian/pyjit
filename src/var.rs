@@ -1,4 +1,5 @@
 use crate::funcs::{self, IR};
+use anyhow::Result;
 use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
 use pyo3::types::PyList;
@@ -62,129 +63,129 @@ impl Var {
 
     pub fn add(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.add(&other.0)))
+        Ok(Var(self.0.add(&other.0)?))
     }
     pub fn sub(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.sub(&other.0)))
+        Ok(Var(self.0.sub(&other.0)?))
     }
     pub fn mul(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.mul(&other.0)))
+        Ok(Var(self.0.mul(&other.0)?))
     }
     pub fn div(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.div(&other.0)))
+        Ok(Var(self.0.div(&other.0)?))
     }
     pub fn modulo(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.modulo(&other.0)))
+        Ok(Var(self.0.modulo(&other.0)?))
     }
     pub fn and(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.and(&other.0)))
+        Ok(Var(self.0.and(&other.0)?))
     }
     pub fn rcp(&self) -> PyResult<Self> {
-        Ok(Var(self.0.rcp()))
+        Ok(Var(self.0.rcp()?))
     }
     pub fn rsqrt(&self) -> PyResult<Self> {
-        Ok(Var(self.0.rsqrt()))
+        Ok(Var(self.0.rsqrt()?))
     }
     pub fn sin(&self) -> PyResult<Self> {
-        Ok(Var(self.0.sin()))
+        Ok(Var(self.0.sin()?))
     }
     pub fn cos(&self) -> PyResult<Self> {
-        Ok(Var(self.0.cos()))
+        Ok(Var(self.0.cos()?))
     }
     pub fn exp2(&self) -> PyResult<Self> {
-        Ok(Var(self.0.exp2()))
+        Ok(Var(self.0.exp2()?))
     }
     pub fn log2(&self) -> PyResult<Self> {
-        Ok(Var(self.0.log2()))
+        Ok(Var(self.0.log2()?))
     }
     pub fn neg(&self) -> PyResult<Self> {
-        Ok(Var(self.0.neg()))
+        Ok(Var(self.0.neg()?))
     }
     pub fn not(&self) -> PyResult<Self> {
-        Ok(Var(self.0.not()))
+        Ok(Var(self.0.not()?))
     }
     pub fn abs(&self) -> PyResult<Self> {
-        Ok(Var(self.0.abs()))
+        Ok(Var(self.0.abs()?))
     }
     pub fn ceil(&self) -> PyResult<Self> {
-        Ok(Var(self.0.floor()))
+        Ok(Var(self.0.floor()?))
     }
     pub fn trunc(&self) -> PyResult<Self> {
-        Ok(Var(self.0.trunc()))
+        Ok(Var(self.0.trunc()?))
     }
     pub fn popc(&self) -> PyResult<Self> {
-        Ok(Var(self.0.popc()))
+        Ok(Var(self.0.popc()?))
     }
     pub fn clz(&self) -> PyResult<Self> {
-        Ok(Var(self.0.clz()))
+        Ok(Var(self.0.clz()?))
     }
     pub fn ctz(&self) -> PyResult<Self> {
-        Ok(Var(self.0.ctz()))
+        Ok(Var(self.0.ctz()?))
     }
     pub fn min(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.min(&other.0)))
+        Ok(Var(self.0.min(&other.0)?))
     }
     pub fn max(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.max(&other.0)))
+        Ok(Var(self.0.max(&other.0)?))
     }
     pub fn eq(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.eq(&other.0)))
+        Ok(Var(self.0.eq(&other.0)?))
     }
     pub fn neq(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.neq(&other.0)))
+        Ok(Var(self.0.neq(&other.0)?))
     }
     pub fn lt(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.lt(&other.0)))
+        Ok(Var(self.0.lt(&other.0)?))
     }
     pub fn le(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.le(&other.0)))
+        Ok(Var(self.0.le(&other.0)?))
     }
     pub fn gt(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.gt(&other.0)))
+        Ok(Var(self.0.gt(&other.0)?))
     }
     pub fn ge(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.ge(&other.0)))
+        Ok(Var(self.0.ge(&other.0)?))
     }
 
     pub fn or(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.or(&other.0)))
+        Ok(Var(self.0.or(&other.0)?))
     }
     pub fn xor(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.xor(&other.0)))
+        Ok(Var(self.0.xor(&other.0)?))
     }
     pub fn shl(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.shl(&other.0)))
+        Ok(Var(self.0.shl(&other.0)?))
     }
     pub fn shr(&self, other: &PyAny) -> PyResult<Self> {
         let other = Self::from_any_of(other, self.0.ty())?;
-        Ok(Var(self.0.shr(&other.0)))
+        Ok(Var(self.0.shr(&other.0)?))
     }
 
     pub fn fma(&self, d1: &PyAny, d2: &PyAny) -> PyResult<Self> {
         let d1 = Self::from_any_of(d1, self.0.ty())?;
         let d2 = Self::from_any_of(d2, self.0.ty())?;
-        Ok(Var(self.0.fma(&d1.0, &d2.0)))
+        Ok(Var(self.0.fma(&d1.0, &d2.0)?))
     }
     pub fn select(&self, d1: &PyAny, d2: &PyAny) -> PyResult<Self> {
         let d1 = Self::from_any_of(d1, self.0.ty())?;
         let d2 = Self::from_any_of(d2, self.0.ty())?;
-        Ok(Var(self.0.select(&d1.0, &d2.0)))
+        Ok(Var(self.0.select(&d1.0, &d2.0)?))
     }
 
     pub fn __add__(&self, other: &PyAny) -> PyResult<Self> {
@@ -241,17 +242,17 @@ impl Var {
     pub fn bitcast(&self, ty: &str) -> PyResult<Self> {
         let ty = ty.to_lowercase();
         match ty.as_str() {
-            "bool" => Ok(Self(self.0.bitcast(&VarType::Bool))),
-            "u8" => Ok(Self(self.0.bitcast(&VarType::U8))),
-            "i8" => Ok(Self(self.0.bitcast(&VarType::I8))),
-            "i16" => Ok(Self(self.0.bitcast(&VarType::I16))),
-            "u16" => Ok(Self(self.0.bitcast(&VarType::U16))),
-            "i32" => Ok(Self(self.0.bitcast(&VarType::I32))),
-            "u32" => Ok(Self(self.0.bitcast(&VarType::U32))),
-            "i64" => Ok(Self(self.0.bitcast(&VarType::I64))),
-            "u64" => Ok(Self(self.0.bitcast(&VarType::U64))),
-            "f32" => Ok(Self(self.0.bitcast(&VarType::F32))),
-            "f64" => Ok(Self(self.0.bitcast(&VarType::F64))),
+            "bool" => Ok(Self(self.0.bitcast(&VarType::Bool)?)),
+            "u8" => Ok(Self(self.0.bitcast(&VarType::U8)?)),
+            "i8" => Ok(Self(self.0.bitcast(&VarType::I8)?)),
+            "i16" => Ok(Self(self.0.bitcast(&VarType::I16)?)),
+            "u16" => Ok(Self(self.0.bitcast(&VarType::U16)?)),
+            "i32" => Ok(Self(self.0.bitcast(&VarType::I32)?)),
+            "u32" => Ok(Self(self.0.bitcast(&VarType::U32)?)),
+            "i64" => Ok(Self(self.0.bitcast(&VarType::I64)?)),
+            "u64" => Ok(Self(self.0.bitcast(&VarType::U64)?)),
+            "f32" => Ok(Self(self.0.bitcast(&VarType::F32)?)),
+            "f64" => Ok(Self(self.0.bitcast(&VarType::F64)?)),
             _ => Err(PyErr::new::<PyTypeError, _>(format!(
                 "Type {ty} is not supported!"
             ))),
@@ -259,11 +260,11 @@ impl Var {
     }
 
     pub fn to_texture(&self, shape: Vec<usize>, n_channels: usize) -> PyResult<Self> {
-        Ok(Var(self.0.to_texture(&shape, n_channels)))
+        Ok(Var(self.0.to_texture(&shape, n_channels)?))
     }
 
     pub fn tex_to_buffer(&self) -> PyResult<Self> {
-        Ok(Var(self.0.tex_to_buffer()))
+        Ok(Var(self.0.tex_to_buffer()?))
     }
 
     pub fn tex_lookup(&self, pos: Vec<&PyAny>) -> PyResult<Vec<Self>> {
@@ -272,12 +273,16 @@ impl Var {
             .map(|p| Self::from_any_of(p, VarType::F32).unwrap().0)
             .collect::<Vec<_>>();
         let pos_refs = pos.iter().map(|p| p).collect::<Vec<_>>();
-        let res = self.0.tex_lookup(pos_refs.as_slice());
-        let res = res.into_iter().map(|r| Var(r)).collect::<Vec<_>>();
+        let res = self.0.tex_lookup(pos_refs.as_slice())?;
+        let res = res.into_iter().map(|r| Var(r)).collect::<_>();
         Ok(res)
     }
 
-    pub fn scatter_reduce(&self, dst: &Self, idx: &PyAny, mask: Option<&PyAny>) {
+    pub fn compress(&self) -> Result<Self> {
+        Ok(Var(self.0.compress()?))
+    }
+
+    pub fn scatter_reduce(&self, dst: &Self, idx: &PyAny, mask: Option<&PyAny>) -> Result<()> {
         let mask = mask.map(|m| Self::from_any_of(m, VarType::Bool).unwrap().0);
         self.0.scatter_reduce(
             &dst.0,
@@ -286,7 +291,7 @@ impl Var {
             ReduceOp::Add,
         )
     }
-    pub fn scatter(&self, dst: &Self, idx: &PyAny, mask: Option<&PyAny>) {
+    pub fn scatter(&self, dst: &Self, idx: &PyAny, mask: Option<&PyAny>) -> Result<()> {
         let mask = mask.map(|m| Self::from_any_of(m, VarType::Bool).unwrap().0);
         self.0.scatter(
             &dst.0,
@@ -297,7 +302,7 @@ impl Var {
     pub fn gather(&self, idx: &PyAny, mask: Option<&PyAny>) -> PyResult<Self> {
         let mask = mask.map(|m| Self::from_any_of(m, VarType::Bool).unwrap().0);
         let idx = Self::from_any_of(idx, VarType::U32)?.0;
-        Ok(Var(self.0.gather(&idx, mask.as_ref())))
+        Ok(Var(self.0.gather(&idx, mask.as_ref())?))
     }
     pub fn trace_ray(
         &self,
@@ -351,62 +356,62 @@ impl Var {
                 sbt_stride.as_ref(),
                 miss_sbt.as_ref(),
                 mask.as_ref(),
-            )
+            )?
             .into_iter()
             .map(|p| Var(p))
             .collect::<Vec<_>>())
     }
-    pub fn __repr__(&self) -> String {
+    pub fn __repr__(&self) -> Result<String> {
         self.schedule();
         funcs::eval();
-        match self.0.ty() {
+        Ok(match self.0.ty() {
             VarType::Void => format!(""),
-            VarType::Bool => format!("bool{:?}", self.0.to_host_bool().as_slice()),
-            VarType::I8 => format!("i8{:?}", self.0.to_host_i8().as_slice()),
-            VarType::U8 => format!("u8{:?}", self.0.to_host_u8().as_slice()),
-            VarType::I16 => format!("i16{:?}", self.0.to_host_i16().as_slice()),
-            VarType::U16 => format!("u16{:?}", self.0.to_host_u16().as_slice()),
-            VarType::I32 => format!("i32{:?}", self.0.to_host_i32().as_slice()),
-            VarType::U32 => format!("u32{:?}", self.0.to_host_u32().as_slice()),
-            VarType::I64 => format!("i64{:?}", self.0.to_host_i64().as_slice()),
-            VarType::U64 => format!("u64{:?}", self.0.to_host_u64().as_slice()),
+            VarType::Bool => format!("bool{:?}", self.0.to_host::<bool>()?.as_slice()),
+            VarType::I8 => format!("i8{:?}", self.0.to_host::<i8>()?.as_slice()),
+            VarType::U8 => format!("u8{:?}", self.0.to_host::<u8>()?.as_slice()),
+            VarType::I16 => format!("i16{:?}", self.0.to_host::<i16>()?.as_slice()),
+            VarType::U16 => format!("u16{:?}", self.0.to_host::<u16>()?.as_slice()),
+            VarType::I32 => format!("i32{:?}", self.0.to_host::<i32>()?.as_slice()),
+            VarType::U32 => format!("u32{:?}", self.0.to_host::<u32>()?.as_slice()),
+            VarType::I64 => format!("i64{:?}", self.0.to_host::<i64>()?.as_slice()),
+            VarType::U64 => format!("u64{:?}", self.0.to_host::<u64>()?.as_slice()),
             VarType::F16 => todo!(),
-            VarType::F32 => format!("f32{:?}", self.0.to_host_f32().as_slice()),
-            VarType::F64 => format!("f64{:?}", self.0.to_host_f64().as_slice()),
-        }
+            VarType::F32 => format!("f32{:?}", self.0.to_host::<f32>()?.as_slice()),
+            VarType::F64 => format!("f64{:?}", self.0.to_host::<f64>()?.as_slice()),
+        })
     }
-    pub fn to_list<'a>(&self, py: Python<'a>) -> &'a PyList {
-        match self.0.ty() {
+    pub fn to_list<'a>(&self, py: Python<'a>) -> Result<&'a PyList> {
+        Ok(match self.0.ty() {
             VarType::Void => todo!(),
-            VarType::Bool => PyList::new(py, self.0.to_host_bool()),
-            VarType::I8 => PyList::new(py, self.0.to_host_i8()),
-            VarType::U8 => PyList::new(py, self.0.to_host_u8()),
-            VarType::I16 => PyList::new(py, self.0.to_host_i16()),
-            VarType::U16 => PyList::new(py, self.0.to_host_u16()),
-            VarType::I32 => PyList::new(py, self.0.to_host_i32()),
-            VarType::U32 => PyList::new(py, self.0.to_host_u32()),
-            VarType::I64 => PyList::new(py, self.0.to_host_i64()),
-            VarType::U64 => PyList::new(py, self.0.to_host_u64()),
+            VarType::Bool => PyList::new(py, self.0.to_host::<bool>()?),
+            VarType::I8 => PyList::new(py, self.0.to_host::<i8>()?),
+            VarType::U8 => PyList::new(py, self.0.to_host::<u8>()?),
+            VarType::I16 => PyList::new(py, self.0.to_host::<i16>()?),
+            VarType::U16 => PyList::new(py, self.0.to_host::<u16>()?),
+            VarType::I32 => PyList::new(py, self.0.to_host::<i32>()?),
+            VarType::U32 => PyList::new(py, self.0.to_host::<u32>()?),
+            VarType::I64 => PyList::new(py, self.0.to_host::<i64>()?),
+            VarType::U64 => PyList::new(py, self.0.to_host::<u64>()?),
             VarType::F16 => todo!(),
-            VarType::F32 => PyList::new(py, self.0.to_host_f32()),
-            VarType::F64 => PyList::new(py, self.0.to_host_f64()),
-        }
+            VarType::F32 => PyList::new(py, self.0.to_host::<f32>()?),
+            VarType::F64 => PyList::new(py, self.0.to_host::<f64>()?),
+        })
     }
-    pub fn to_numpy<'a>(&self, py: Python<'a>) -> &'a PyAny {
-        match self.0.ty() {
+    pub fn to_numpy<'a>(&self, py: Python<'a>) -> Result<&'a PyAny> {
+        Ok(match self.0.ty() {
             VarType::Void => todo!(),
-            VarType::Bool => numpy::PyArray1::<bool>::from_vec(py, self.0.to_host_bool()),
-            VarType::I8 => numpy::PyArray1::<i8>::from_vec(py, self.0.to_host_i8()),
-            VarType::U8 => numpy::PyArray1::<u8>::from_vec(py, self.0.to_host_u8()),
-            VarType::I16 => numpy::PyArray1::<i16>::from_vec(py, self.0.to_host_i16()),
-            VarType::U16 => numpy::PyArray1::<u16>::from_vec(py, self.0.to_host_u16()),
-            VarType::I32 => numpy::PyArray1::<i32>::from_vec(py, self.0.to_host_i32()),
-            VarType::U32 => numpy::PyArray1::<u32>::from_vec(py, self.0.to_host_u32()),
-            VarType::I64 => numpy::PyArray1::<i64>::from_vec(py, self.0.to_host_i64()),
-            VarType::U64 => numpy::PyArray1::<u64>::from_vec(py, self.0.to_host_u64()),
+            VarType::Bool => numpy::PyArray1::<bool>::from_vec(py, self.0.to_host::<bool>()?),
+            VarType::I8 => numpy::PyArray1::<i8>::from_vec(py, self.0.to_host::<i8>()?),
+            VarType::U8 => numpy::PyArray1::<u8>::from_vec(py, self.0.to_host::<u8>()?),
+            VarType::I16 => numpy::PyArray1::<i16>::from_vec(py, self.0.to_host::<i16>()?),
+            VarType::U16 => numpy::PyArray1::<u16>::from_vec(py, self.0.to_host::<u16>()?),
+            VarType::I32 => numpy::PyArray1::<i32>::from_vec(py, self.0.to_host::<i32>()?),
+            VarType::U32 => numpy::PyArray1::<u32>::from_vec(py, self.0.to_host::<u32>()?),
+            VarType::I64 => numpy::PyArray1::<i64>::from_vec(py, self.0.to_host::<i64>()?),
+            VarType::U64 => numpy::PyArray1::<u64>::from_vec(py, self.0.to_host::<u64>()?),
             VarType::F16 => todo!(),
-            VarType::F32 => numpy::PyArray1::<f32>::from_vec(py, self.0.to_host_f32()),
-            VarType::F64 => numpy::PyArray1::<f64>::from_vec(py, self.0.to_host_f64()),
-        }
+            VarType::F32 => numpy::PyArray1::<f32>::from_vec(py, self.0.to_host::<f32>()?),
+            VarType::F64 => numpy::PyArray1::<f64>::from_vec(py, self.0.to_host::<f64>()?),
+        })
     }
 }

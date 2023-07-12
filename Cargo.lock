@@ -27,6 +27,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.71"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c7d0618f0e0b7e8ff11427422b64564d5fb0be1940354bfe2e0529b18a9d9b8"
+dependencies = [
+ "backtrace",
+]
+
+[[package]]
 name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -187,6 +196,12 @@ dependencies = [
  "libloading",
  "thiserror",
 ]
+
+[[package]]
+name = "downcast-rs"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 
 [[package]]
 name = "either"
@@ -599,6 +614,7 @@ dependencies = [
 name = "pyjit"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "numpy",
  "once_cell",
  "parking_lot 0.12.1",
@@ -614,6 +630,7 @@ version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3b1ac5b3731ba34fdaa9785f8d74d17448cd18f30cf19e0c7e7b1fdb5272109"
 dependencies = [
+ "anyhow",
  "cfg-if 1.0.0",
  "indoc",
  "libc",
@@ -786,14 +803,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a5996294f19bd3aae0453a862ad728f60e6600695733dd5df01da90c54363a3c"
 
 [[package]]
+name = "resource-pool"
+version = "0.1.0"
+source = "git+https://github.com/DoeringChristian/resource-pool.git#c941ae7558a11c24daff034430e495774cb98527"
+
+[[package]]
 name = "rjit"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "approx",
  "bitflags 2.2.1",
  "bytemuck",
  "bytesize",
  "cuda-rs",
+ "downcast-rs",
  "fasthash",
  "glam",
  "half",
@@ -806,6 +830,7 @@ dependencies = [
  "paste",
  "pretty_env_logger",
  "rayon",
+ "resource-pool",
  "slotmap",
  "smallvec",
  "thiserror",

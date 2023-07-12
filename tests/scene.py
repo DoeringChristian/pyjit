@@ -128,8 +128,8 @@ if __name__ == "__main__":
                 "type": "orthogonal",
                 "film": {
                     "type": "hdrfilm",
-                    "width": 10,
-                    "height": 10,
+                    "width": 1024,
+                    "height": 1024,
                 },
             },
         }

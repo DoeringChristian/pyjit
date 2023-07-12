@@ -1,4 +1,5 @@
 use super::var::Var;
+use anyhow::Result;
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use pyo3::exceptions::PyTypeError;
@@ -27,8 +28,8 @@ pub fn set_compile_options(num_payload_values: u32) {
 }
 
 #[pyfunction]
-pub fn set_backend(backend: &str) {
-    IR.set_backend(backend)
+pub fn set_backend(backend: &str) -> Result<()> {
+    IR.set_backend(&[backend])
 }
 
 #[pyfunction]
@@ -42,8 +43,8 @@ pub fn index(num: usize) -> Var {
 }
 
 #[pyfunction]
-pub fn texture(shape: Vec<usize>, n_channels: usize) -> Var {
-    Var(IR.texture(&shape, n_channels))
+pub fn texture(shape: Vec<usize>, n_channels: usize) -> Result<Var> {
+    Ok(Var(IR.texture(&shape, n_channels)?))
 }
 
 enum GeometryDesc {
@@ -86,7 +87,7 @@ impl AccelDesc {
 }
 
 #[pyfunction]
-pub fn accel(desc: &AccelDesc) -> Var {
+pub fn accel(desc: &AccelDesc) -> Result<Var> {
     let geometries = desc
         .geometries
         .iter()
@@ -109,7 +110,7 @@ pub fn accel(desc: &AccelDesc) -> Var {
         geometries: &geometries,
         instances: &instances,
     };
-    Var(IR.accel(desc))
+    Ok(Var(IR.accel(desc)?))
 }
 
 macro_rules! initializer {
@@ -121,17 +122,17 @@ macro_rules! initializer {
                     if val.0.ty() == rjit::VarType::[<$ty:camel>] {
                         return Ok(val);
                     } else {
-                        return Ok(Var(val.0.cast(&rjit::VarType::[<$ty:camel>])));
+                        return Ok(Var(val.0.cast(&rjit::VarType::[<$ty:camel>])?));
                     }
                 }
                 if let Ok(val) = value.extract::<$ty>() {
-                    return Ok(Var(IR.sized_literal::<$ty>(val, num.unwrap_or(1))));
+                    return Ok(Var(IR.sized_literal::<$ty>(val, num.unwrap_or(1))?));
                 }
                 if let Ok(val) = value.extract::<Vec<$ty>>() {
-                    return Ok(Var(IR.array(&val)));
+                    return Ok(Var(IR.array(&val)?));
                 }
                 if let Ok(val) = value.extract::<numpy::PyReadonlyArray1<$ty>>() {
-                    return Ok(Var(IR.array(&val.to_vec()?)));
+                    return Ok(Var(IR.array(&val.to_vec()?)?));
                 }
 
                 Err(PyErr::new::<PyTypeError, _>(
