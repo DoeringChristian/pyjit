@@ -68,10 +68,6 @@ class Scene:
     integrators: list[Integrator] = []
 
     def __init__(self, desc: dict[str, Any]):
-        pyjit.set_compile_options(5)
-        pyjit.set_miss("__miss__ms", miss_and_closesthit_ptx)
-        pyjit.push_hit("__closesthit__ch", miss_and_closesthit_ptx)
-
         self.acceldesc = pyjit.AccelDesc()
         geometries = {}
         for k, v in desc.items():
@@ -88,6 +84,9 @@ class Scene:
                 self.sensors.append(new_sensor(v.copy()))
             if v["type"] in integrators:
                 self.integrators.append(new_integrator(v.copy()))
+
+        self.acceldesc.add_miss_group("__miss__ms", miss_and_closesthit_ptx)
+        self.acceldesc.add_hit_group("__closesthit__ch", miss_and_closesthit_ptx)
 
         self.accel: pyjit.Var = pyjit.accel(self.acceldesc)
 

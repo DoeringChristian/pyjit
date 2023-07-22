@@ -38,9 +38,6 @@ fn pyjit(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(funcs::accel, m)?)?;
 
     m.add_function(wrap_pyfunction!(funcs::set_backend, m)?)?;
-    m.add_function(wrap_pyfunction!(funcs::set_miss, m)?)?;
-    m.add_function(wrap_pyfunction!(funcs::push_hit, m)?)?;
-    m.add_function(wrap_pyfunction!(funcs::set_compile_options, m)?)?;
 
     m.add_function(wrap_pyfunction!(funcs::eval, m)?)?;
     Ok(())

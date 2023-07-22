@@ -1,31 +1,11 @@
 use super::var::Var;
 use anyhow::Result;
 use once_cell::sync::Lazy;
-use parking_lot::Mutex;
 use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
-use pyo3::types::{PyDict, PyTuple};
-use rjit::backend::CompileOptions;
-use rjit::{Jit, Trace};
+use rjit::Trace;
 
 pub static IR: Lazy<Trace> = Lazy::new(|| Trace::default());
-
-#[pyfunction]
-pub fn set_miss(enty_point: &str, source: &str) {
-    IR.backend().set_miss_from_str(enty_point, source);
-}
-
-#[pyfunction]
-pub fn push_hit(enty_point: &str, source: &str) {
-    IR.backend().push_hit_from_str(enty_point, source);
-}
-
-#[pyfunction]
-pub fn set_compile_options(num_payload_values: u32) {
-    IR.backend().set_compile_options(&CompileOptions {
-        num_payload_values: num_payload_values as _,
-    });
-}
 
 #[pyfunction]
 pub fn set_backend(backend: &str) -> Result<()> {
@@ -53,11 +33,28 @@ enum GeometryDesc {
 struct InstanceDesc {
     pub geometry: usize,
     pub transform: [f32; 12],
+    pub hit_group: u32,
+}
+
+pub struct ModuleDesc {
+    pub asm: String,
+    pub entry_point: String,
+}
+
+pub struct HitGroupDesc {
+    pub closest_hit: ModuleDesc,
+    pub any_hit: Option<ModuleDesc>,
+    pub intersection: Option<ModuleDesc>,
+}
+pub struct MissGroupDesc {
+    pub miss: ModuleDesc,
 }
 
 #[pyclass]
 #[derive(Default)]
 pub struct AccelDesc {
+    hit_groups: Vec<HitGroupDesc>,
+    miss_groups: Vec<MissGroupDesc>,
     geometries: Vec<GeometryDesc>,
     instances: Vec<InstanceDesc>,
 }
@@ -78,11 +75,51 @@ impl AccelDesc {
         });
         Ok(id)
     }
-    pub fn add_instance(&mut self, geometry: usize, transform: [f32; 12]) {
+    pub fn add_instance(&mut self, geometry: usize, transform: [f32; 12], hit_group: u32) {
         self.instances.push(InstanceDesc {
             geometry,
             transform,
+            hit_group,
         })
+    }
+    pub fn add_hit_group(
+        &mut self,
+        closest_hit_entry_point: &str,
+        closest_hit_asm: &str,
+        any_hit_entry_point: Option<&str>,
+        any_hit_asm: Option<&str>,
+        intersection_entry_point: Option<&str>,
+        intersection_asm: Option<&str>,
+    ) -> u32 {
+        let any_hit = any_hit_asm.map(|ah| ModuleDesc {
+            asm: ah.into(),
+            entry_point: any_hit_entry_point.unwrap().into(),
+        });
+        let intersection = intersection_asm.map(|int| ModuleDesc {
+            asm: int.into(),
+            entry_point: intersection_entry_point.unwrap().into(),
+        });
+
+        let idx = self.hit_groups.len();
+        self.hit_groups.push(HitGroupDesc {
+            closest_hit: ModuleDesc {
+                asm: closest_hit_asm.into(),
+                entry_point: closest_hit_entry_point.into(),
+            },
+            any_hit,
+            intersection,
+        });
+        idx as _
+    }
+    pub fn add_miss_group(&mut self, entry_point: &str, asm: &str) -> u32 {
+        let idx = self.miss_groups.len();
+        self.miss_groups.push(MissGroupDesc {
+            miss: ModuleDesc {
+                asm: asm.into(),
+                entry_point: entry_point.into(),
+            },
+        });
+        idx as _
     }
 }
 
@@ -104,9 +141,45 @@ pub fn accel(desc: &AccelDesc) -> Result<Var> {
         .map(|i| rjit::InstanceDesc {
             geometry: i.geometry,
             transform: i.transform,
+            hit_group: i.hit_group,
         })
         .collect::<Vec<_>>();
+
+    let hit_groups = desc
+        .hit_groups
+        .iter()
+        .map(|hg| rjit::HitGroupDesc {
+            closest_hit: rjit::ModuleDesc {
+                asm: &hg.closest_hit.asm,
+                entry_point: &hg.closest_hit.entry_point,
+            },
+            any_hit: hg.any_hit.as_ref().map(|ah| rjit::ModuleDesc {
+                asm: &ah.asm,
+                entry_point: &ah.entry_point,
+            }),
+            intersection: hg.intersection.as_ref().map(|int| rjit::ModuleDesc {
+                asm: &int.asm,
+                entry_point: &int.entry_point,
+            }),
+        })
+        .collect::<Vec<_>>();
+
+    let miss_groups = desc
+        .miss_groups
+        .iter()
+        .map(|mg| rjit::MissGroupDesc {
+            miss: rjit::ModuleDesc {
+                asm: &mg.miss.asm,
+                entry_point: &mg.miss.entry_point,
+            },
+        })
+        .collect::<Vec<_>>();
+    let sbt = rjit::SBTDesc {
+        hit_groups: &hit_groups,
+        miss_groups: &miss_groups,
+    };
     let desc = rjit::AccelDesc {
+        sbt,
         geometries: &geometries,
         instances: &instances,
     };

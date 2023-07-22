@@ -38,7 +38,7 @@ class Instance:
         self.ref = desc.pop("ref")
         self.to_world = Matrix4f(desc.pop("to_world", Matrix4f.ident()))
         self.geometry = geometries[self.ref]
-        acceldesc.add_instance(self.geometry, self.to_world.to_3x4())
+        acceldesc.add_instance(self.geometry, self.to_world.to_3x4(), 0)
 
 
 if __name__ == "__main__":
